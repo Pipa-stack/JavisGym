@@ -2,9 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, CalendarPlus, Camera, Trophy } from "lucide-react";
 import { WorkoutLogger } from "./workout-logger";
+import { PhotoUpload } from "./photo-upload";
+import { Achievements } from "./achievements";
+import { ClassReservation } from "./class-reservation";
 
 export function QuickActions() {
   const [showWorkoutLogger, setShowWorkoutLogger] = useState(false);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showClassReservation, setShowClassReservation] = useState(false);
 
   const actions = [
     {
@@ -16,20 +22,20 @@ export function QuickActions() {
     {
       icon: CalendarPlus,
       label: "Reservar Clase",
-      color: "text-orange",
-      onClick: () => console.log("Reservar clase"),
+      color: "text-orange-500",
+      onClick: () => setShowClassReservation(true),
     },
     {
       icon: Camera,
       label: "Subir Foto",
       color: "text-primary",
-      onClick: () => console.log("Subir foto"),
+      onClick: () => setShowPhotoUpload(true),
     },
     {
       icon: Trophy,
       label: "Ver Logros",
-      color: "text-success",
-      onClick: () => console.log("Ver logros"),
+      color: "text-yellow-500",
+      onClick: () => setShowAchievements(true),
     },
   ];
 
@@ -52,6 +58,24 @@ export function QuickActions() {
       {showWorkoutLogger && (
         <div className="mb-6">
           <WorkoutLogger />
+        </div>
+      )}
+
+      {showPhotoUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <PhotoUpload onClose={() => setShowPhotoUpload(false)} />
+        </div>
+      )}
+
+      {showAchievements && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Achievements onClose={() => setShowAchievements(false)} />
+        </div>
+      )}
+
+      {showClassReservation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <ClassReservation onClose={() => setShowClassReservation(false)} />
         </div>
       )}
     </>
