@@ -166,6 +166,103 @@ export class MemStorage implements IStorage {
       status: "active",
     };
     this.classes.set(class2.id, class2);
+
+    // Seed workout data for Carlos
+    const workouts = [
+      {
+        userId: 2, // Carlos
+        exerciseName: "Press Banca",
+        weight: "80",
+        reps: 8,
+        sets: 3,
+        type: "strength",
+        date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: 2,
+        exerciseName: "Sentadillas",
+        weight: "100",
+        reps: 10,
+        sets: 4,
+        type: "strength",
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: 2,
+        exerciseName: "Peso Muerto",
+        weight: "120",
+        reps: 6,
+        sets: 3,
+        type: "strength",
+        date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: 2,
+        exerciseName: "Press Militar",
+        weight: "45",
+        reps: 8,
+        sets: 3,
+        type: "strength",
+        date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: 2,
+        exerciseName: "Dominadas",
+        weight: "0",
+        reps: 12,
+        sets: 3,
+        type: "strength",
+        date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+      },
+    ];
+
+    workouts.forEach(workout => {
+      const id = this.currentWorkoutId++;
+      const workoutRecord: Workout = {
+        ...workout,
+        id,
+        duration: null,
+        calories: null,
+        date: workout.date,
+      };
+      this.workouts.set(id, workoutRecord);
+    });
+
+    // Seed social posts
+    const socialPosts = [
+      {
+        userId: 2, // Carlos
+        content: "¡Nuevo PR en press banca! 80kg x 8 reps 💪 El progreso constante da sus frutos.",
+        imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop",
+        workoutId: 1,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: 3, // María
+        content: "Terminé mi primera clase de HIIT 🔥 ¡Qué intensidad! Ya tengo ganas de la próxima sesión.",
+        imageUrl: null,
+        workoutId: null,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: 1, // Admin/Entrenador
+        content: "Recordatorio: Mañana tenemos clase de Fuerza Total a las 18:00. ¡Prepárense para entrenar duro! 🏋️‍♂️",
+        imageUrl: null,
+        workoutId: null,
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      },
+    ];
+
+    socialPosts.forEach(post => {
+      const id = this.currentSocialPostId++;
+      const socialPost: SocialPost = {
+        ...post,
+        id,
+        likes: Math.floor(Math.random() * 15) + 5,
+        comments: Math.floor(Math.random() * 8) + 2,
+      };
+      this.socialPosts.set(id, socialPost);
+    });
   }
 
   // User methods

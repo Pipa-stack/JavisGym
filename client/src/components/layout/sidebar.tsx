@@ -20,10 +20,10 @@ export function Sidebar({ variant }: SidebarProps) {
 
   const clientNavItems = [
     { icon: Home, label: "Feed Social", href: "/", active: location === "/" },
-    { icon: Calendar, label: "Mis Clases", href: "/classes", active: false },
-    { icon: Dumbbell, label: "Mis Ejercicios", href: "/exercises", active: false },
-    { icon: BarChart3, label: "Estadísticas", href: "/stats", active: false },
-    { icon: Users, label: "Comunidad", href: "/community", active: false },
+    { icon: Calendar, label: "Mis Clases", href: "/classes", active: location === "/classes" },
+    { icon: Dumbbell, label: "Mis Ejercicios", href: "/exercises", active: location === "/exercises" },
+    { icon: BarChart3, label: "Estadísticas", href: "/stats", active: location === "/stats" },
+    { icon: Users, label: "Comunidad", href: "/community", active: location === "/community" },
   ];
 
   const adminNavItems = [

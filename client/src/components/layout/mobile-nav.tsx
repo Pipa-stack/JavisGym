@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { Home, Calendar, BarChart3, Users, User } from "lucide-react";
+import { useLocation } from "wouter";
+import { Home, Calendar, Dumbbell, BarChart3, User } from "lucide-react";
 
 export function MobileNav() {
-  const [activeTab, setActiveTab] = useState("home");
+  const [location, setLocation] = useLocation();
 
   const navItems = [
-    { id: "home", icon: Home, label: "Inicio" },
-    { id: "classes", icon: Calendar, label: "Clases" },
-    { id: "progress", icon: BarChart3, label: "Progreso" },
-    { id: "social", icon: Users, label: "Social" },
-    { id: "profile", icon: User, label: "Perfil" },
+    { id: "home", icon: Home, label: "Inicio", href: "/" },
+    { id: "exercises", icon: Dumbbell, label: "Ejercicios", href: "/exercises" },
+    { id: "classes", icon: Calendar, label: "Clases", href: "/classes" },
+    { id: "progress", icon: BarChart3, label: "Progreso", href: "/stats" },
+    { id: "profile", icon: User, label: "Perfil", href: "/profile" },
   ];
 
   return (
@@ -19,11 +19,11 @@ export function MobileNav() {
           <button
             key={item.id}
             className={`flex flex-col items-center justify-center transition-colors ${
-              activeTab === item.id 
+              location === item.href 
                 ? "text-primary" 
                 : "text-gray-400 dark:text-muted-foreground"
             }`}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => setLocation(item.href)}
           >
             <item.icon className="h-5 w-5" />
             <span className="text-xs mt-1">{item.label}</span>
