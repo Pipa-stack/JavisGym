@@ -18,6 +18,8 @@ import {
   type Activity,
   type InsertActivity
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -461,4 +463,187 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  // Class methods
+  async getClass(id: number): Promise<GymClass | undefined> {
+    const [gymClass] = await db.select().from(classes).where(eq(classes.id, id));
+    return gymClass || undefined;
+  }
+
+  async getAllClasses(): Promise<GymClass[]> {
+    return await db.select().from(classes);
+  }
+
+  async getClassesByDate(date: Date): Promise<GymClass[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    return await db.select().from(classes).where(
+      // Using simple date comparison for now
+      eq(classes.status, "active")
+    );
+  }
+
+  async createClass(insertClass: InsertClass): Promise<GymClass> {
+    const [gymClass] = await db
+      .insert(classes)
+      .values({
+        ...insertClass,
+        currentEnrollment: 0,
+      })
+      .returning();
+    return gymClass;
+  }
+
+  async updateClass(id: number, updates: Partial<GymClass>): Promise<GymClass | undefined> {
+    const [gymClass] = await db
+      .update(classes)
+      .set(updates)
+      .where(eq(classes.id, id))
+      .returning();
+    return gymClass || undefined;
+  }
+
+  async deleteClass(id: number): Promise<boolean> {
+    const result = await db.delete(classes).where(eq(classes.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Reservation methods
+  async createReservation(insertReservation: InsertReservation): Promise<Reservation> {
+    const [reservation] = await db
+      .insert(reservations)
+      .values(insertReservation)
+      .returning();
+
+    // Update class enrollment
+    await db
+      .update(classes)
+      .set({ currentEnrollment: db.select().from(classes).where(eq(classes.id, insertReservation.classId)) })
+      .where(eq(classes.id, insertReservation.classId));
+
+    return reservation;
+  }
+
+  async getUserReservations(userId: number): Promise<Reservation[]> {
+    return await db.select().from(reservations).where(eq(reservations.userId, userId));
+  }
+
+  async getClassReservations(classId: number): Promise<Reservation[]> {
+    return await db.select().from(reservations).where(eq(reservations.classId, classId));
+  }
+
+  async cancelReservation(id: number): Promise<boolean> {
+    const result = await db.delete(reservations).where(eq(reservations.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Workout methods
+  async createWorkout(insertWorkout: InsertWorkout): Promise<Workout> {
+    const [workout] = await db
+      .insert(workouts)
+      .values(insertWorkout)
+      .returning();
+    return workout;
+  }
+
+  async getUserWorkouts(userId: number): Promise<Workout[]> {
+    return await db.select().from(workouts).where(eq(workouts.userId, userId));
+  }
+
+  async getRecentWorkouts(userId: number, limit = 10): Promise<Workout[]> {
+    return await db
+      .select()
+      .from(workouts)
+      .where(eq(workouts.userId, userId))
+      .orderBy(workouts.date)
+      .limit(limit);
+  }
+
+  // Social post methods
+  async createSocialPost(insertPost: InsertSocialPost): Promise<SocialPost> {
+    const [post] = await db
+      .insert(socialPosts)
+      .values(insertPost)
+      .returning();
+    return post;
+  }
+
+  async getAllSocialPosts(): Promise<SocialPost[]> {
+    return await db.select().from(socialPosts).orderBy(socialPosts.createdAt);
+  }
+
+  async getUserSocialPosts(userId: number): Promise<SocialPost[]> {
+    return await db
+      .select()
+      .from(socialPosts)
+      .where(eq(socialPosts.userId, userId))
+      .orderBy(socialPosts.createdAt);
+  }
+
+  async likeSocialPost(postId: number): Promise<SocialPost | undefined> {
+    const [post] = await db
+      .update(socialPosts)
+      .set({ likes: socialPosts.likes + 1 })
+      .where(eq(socialPosts.id, postId))
+      .returning();
+    return post || undefined;
+  }
+
+  // Activity methods
+  async createActivity(insertActivity: InsertActivity): Promise<Activity> {
+    const [activity] = await db
+      .insert(activities)
+      .values(insertActivity)
+      .returning();
+    return activity;
+  }
+
+  async getRecentActivities(limit = 10): Promise<Activity[]> {
+    return await db
+      .select()
+      .from(activities)
+      .orderBy(activities.createdAt)
+      .limit(limit);
+  }
+}
+
+export const storage = new DatabaseStorage();
