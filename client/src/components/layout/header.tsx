@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { RefreshCw, Dumbbell } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Header() {
   const [location, setLocation] = useLocation();
@@ -27,7 +28,7 @@ export function Header() {
           </div>
           <div className="flex items-center space-x-4">
             {user?.isAdmin && (
-              <Button 
+              <Button
                 onClick={toggleView}
                 className="bg-primary hover:bg-primary/90 text-white"
               >
@@ -35,6 +36,7 @@ export function Header() {
                 {isAdminView ? "Vista Cliente" : "Vista Admin"}
               </Button>
             )}
+            <ThemeToggle />
             <div className="flex items-center space-x-2">
               <img
                 src={user?.profileImage || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"}
